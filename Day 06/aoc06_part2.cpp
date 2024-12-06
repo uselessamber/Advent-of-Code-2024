@@ -10,10 +10,7 @@ const int dr[4] = {-1,  0,  1,  0};
 const int dc[4] = { 0,  1,  0, -1};
 
 vector<string> mp;
-enum TABLE_RESULT {
-    not_visited, visited, loopable, non_loopable
-};
-vector<vector<vector<int>>> memoization_table;
+vector<vector<vector<bool>>> visit;
 vector<vector<bool>> blockmap;
 int R = 0, C = 0;
 int sr, sc, sd;
@@ -26,29 +23,46 @@ bool wall_check(int row, int col, int dir){
     return in_bound(row + dr[dir], col + dc[dir]) && mp[row + dr[dir]][col + dc[dir]] == '#';
 }
 
-int search(int row, int col, int dir){
-    if (!in_bound(row, col)) return non_loopable;
+typedef pair<int, int> pii;
+typedef pair<pii, pii> piiii;
 
-    if (memoization_table[row][col][dir] != not_visited){
-        if (memoization_table[row][col][dir] == visited) return loopable;
-        return memoization_table[row][col][dir];
-    }
-
-    memoization_table[row][col][dir] = visited;
-
-    if (!wall_check(row, col, dir)){
-        memoization_table[row][col][dir] = search(row + dr[dir], col + dc[dir], dir);
+bool theoretical_step(int row, int col, int dir, int w_row, int w_col){
+    if (!in_bound(row, col)) return false;
+    if (visit[row][col][dir]) return true;
+    visit[row][col][dir] = true;
+    if (!wall_check(row, col, dir) && !(row + dr[dir] == w_row && col + dc[dir] == w_col)){
+        if (theoretical_step(row + dr[dir], col + dc[dir], dir, w_row, w_col)){
+            visit[row][col][dir] = false;
+            return true;
+        }else{
+            visit[row][col][dir] = false;
+            return false;
+        }
     }else{
-        memoization_table[row][col][dir] = search(row, col, dir);
+        if (theoretical_step(row, col, (dir + 1) % 4, w_row, w_col)){
+            visit[row][col][dir] = false;
+            return true;
+        }else{
+            visit[row][col][dir] = false;
+            return false;
+        }
     }
+    visit[row][col][dir] = false;
+    return false;
 }
 
 int path_scan(int start_row, int start_col, int start_dir){
     int ans = 0;
-    memoization_table.assign(R, vector<vector<int>>(C, vector<int>(4, not_visited)));
+    visit.assign(R, vector<vector<bool>>(C, vector<bool>(4, false)));
     blockmap.assign(R, vector<bool>(C, false));
 
-    
+    for (int block_row = 0; block_row < R; block_row++){
+        for (int block_col = 0; block_col < C; block_col++){
+            if (mp[block_row][block_col] == '.'){
+                ans += theoretical_step(start_row, start_col, start_dir, block_row, block_col);
+            }
+        }
+    }
 
     return ans;
 }
