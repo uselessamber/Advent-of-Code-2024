@@ -6,7 +6,9 @@
 #include <map>
 #include <algorithm>
 #include <queue>
+#include <chrono>
 using namespace std;
+using namespace std::chrono;
 typedef long long ll;
 typedef pair<ll, int> pli;
 const bool debug = false;
@@ -132,6 +134,7 @@ bool meet_in_the_middle(){
 }
 
 int main(){
+    auto start = high_resolution_clock::now();
     ifstream fi("aoc07.inp");
     ofstream fo("aoc07.out");
     string temp;
@@ -163,4 +166,7 @@ int main(){
         dp.clear();
     }
     fo << result;
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end - start);
+    cout << "Execute time: " << duration.count() << "ms\n";
 }
