@@ -31,8 +31,6 @@ struct antenna {
     void calculate_antinodes(vector<vector<bool>> &antinode_map) {
         for (int p1 = 0; p1 < (int)this->coordinates.size() - 1; p1++){
             for (int p2 = p1 + 1; p2 < (int)this->coordinates.size(); p2++){
-
-
                 pii diff = get_diff(this->coordinates[p1], this->coordinates[p2]);
                 pii idiff = get_inverse(diff);
 
